@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mobile Style Calling App</title>
-  <!-- FontAwesome Icons for Phone, Mic, Video Buttons -->
+  <title>Mobile Calling & Chat App</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <style>
@@ -19,7 +18,6 @@
       min-height: 100vh;
     }
 
-    /* Mobile Screen Container */
     .phone-screen {
       width: 100%;
       max-width: 400px;
@@ -36,17 +34,15 @@
       border: 1px solid #333;
     }
 
-    /* Header & Call Status */
     .call-header {
-      padding: 30px 20px;
+      padding: 20px;
       text-align: center;
       z-index: 10;
       background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
     }
-    .call-status { font-size: 14px; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
-    .room-display { font-size: 18px; font-weight: bold; color: #28a745; margin-top: 5px; }
+    .call-status { font-size: 13px; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
+    .room-display { font-size: 16px; font-weight: bold; color: #28a745; margin-top: 3px; }
 
-    /* Video Container */
     .video-viewport {
       flex: 1;
       position: relative;
@@ -56,28 +52,25 @@
       align-items: center;
     }
 
-    /* Remote Video (Full Screen) */
     #remoteVideo {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
 
-    /* Local Video (Floating Pip Screen) */
     #localVideo {
       position: absolute;
-      top: 20px;
-      right: 20px;
-      width: 100px;
-      height: 140px;
+      top: 15px;
+      right: 15px;
+      width: 90px;
+      height: 130px;
       object-fit: cover;
-      border-radius: 12px;
+      border-radius: 10px;
       border: 2px solid #555;
       box-shadow: 0 4px 10px rgba(0,0,0,0.5);
       z-index: 5;
     }
 
-    /* Placeholder for Audio Call Mode */
     .avatar-placeholder {
       position: absolute;
       display: none;
@@ -86,9 +79,60 @@
       justify-content: center;
       z-index: 2;
     }
-    .avatar-placeholder i { font-size: 80px; color: #555; margin-bottom: 10px; }
+    .avatar-placeholder i { font-size: 70px; color: #555; margin-bottom: 10px; }
 
-    /* Setup / Room Input Panel */
+    /* Chat Overlay Box */
+    .chat-box {
+      position: absolute;
+      bottom: 100px;
+      left: 10px;
+      right: 10px;
+      height: 180px;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(5px);
+      border-radius: 12px;
+      display: none;
+      flex-direction: column;
+      padding: 10px;
+      z-index: 15;
+      border: 1px solid #333;
+    }
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      font-size: 13px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+    .msg { padding: 6px 10px; border-radius: 8px; max-width: 80%; word-break: break-word; }
+    .msg.incoming { background: #333; align-self: flex-start; }
+    .msg.outgoing { background: #007bff; align-self: flex-end; }
+    
+    .chat-input-area {
+      display: flex;
+      gap: 5px;
+    }
+    .chat-input-area input {
+      flex: 1;
+      padding: 8px;
+      font-size: 13px;
+      background: #222;
+      border: 1px solid #444;
+      color: #fff;
+      border-radius: 6px;
+      text-align: left;
+    }
+    .chat-input-area button {
+      padding: 8px 12px;
+      background: #007bff;
+      border: none;
+      color: #fff;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
     .setup-panel {
       position: absolute;
       bottom: 110px;
@@ -122,13 +166,13 @@
     }
     .mode-btn.active { background: #007bff; color: #fff; border-color: #007bff; }
 
-    input {
+    input.main-input {
       padding: 12px;
       background: #2a2a2a;
       border: 1px solid #444;
       color: #fff;
       border-radius: 8px;
-      font-size: 14px;
+      font-size: 15px;
       text-align: center;
     }
 
@@ -144,9 +188,8 @@
     .btn-create { background: #28a745; }
     .btn-join { background: #17a2b8; }
 
-    /* Bottom Control Bar (Call Controls) */
     .controls-bar {
-      height: 100px;
+      height: 90px;
       background: rgba(0,0,0,0.9);
       display: flex;
       justify-content: space-evenly;
@@ -156,13 +199,13 @@
     }
 
     .icon-btn {
-      width: 55px;
-      height: 55px;
+      width: 50px;
+      height: 50px;
       border-radius: 50%;
       border: none;
       background: #333;
       color: white;
-      font-size: 20px;
+      font-size: 18px;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -171,23 +214,20 @@
     }
     .icon-btn:hover { opacity: 0.8; }
     .icon-btn.off { background: #dc3545; }
-    .icon-btn.end-call { background: #dc3545; width: 65px; height: 65px; font-size: 24px; }
+    .icon-btn.end-call { background: #dc3545; width: 60px; height: 60px; font-size: 22px; }
   </style>
 
-  <!-- Firebase v8 -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 </head>
 <body>
 
   <div class="phone-screen">
-    <!-- Header -->
     <div class="call-header">
       <div id="statusText" class="call-status">Ready to Call</div>
       <div id="roomIdText" class="room-display"></div>
     </div>
 
-    <!-- Video Area -->
     <div class="video-viewport">
       <video id="remoteVideo" autoplay playsinline></video>
       <video id="localVideo" autoplay playsinline muted></video>
@@ -196,37 +236,42 @@
         <i class="fa-solid fa-user-large"></i>
         <p>Voice Call</p>
       </div>
+
+      <!-- Chat UI Overlay -->
+      <div id="chatBox" class="chat-box">
+        <div id="chatMessages" class="chat-messages"></div>
+        <div class="chat-input-area">
+          <input type="text" id="msgInput" placeholder="Type a message...">
+          <button onclick="sendMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+      </div>
     </div>
 
-    <!-- Setup Panel -->
     <div id="setupPanel" class="setup-panel">
       <div class="mode-selector">
         <button id="videoModeBtn" class="mode-btn active" onclick="setCallMode('video')">
-          <i class="fa-solid fa-video"></i> Video Call
+          <i class="fa-solid fa-video"></i> Video
         </button>
         <button id="audioModeBtn" class="mode-btn" onclick="setCallMode('audio')">
-          <i class="fa-solid fa-phone"></i> Audio Call
+          <i class="fa-solid fa-phone"></i> Audio
         </button>
       </div>
 
       <button class="btn-action btn-create" onclick="createCall()">Start New Call</button>
-      <input type="text" id="callInput" placeholder="Enter Room ID to Join">
+      <input type="text" class="main-input" id="callInput" placeholder="Enter 10-Digit Room ID">
       <button class="btn-action btn-join" onclick="joinCall()">Join Call</button>
     </div>
 
-    <!-- Bottom Controls -->
     <div class="controls-bar">
-      <!-- Mute Mic Button -->
       <button id="micBtn" class="icon-btn" onclick="toggleMic()" disabled>
         <i class="fa-solid fa-microphone"></i>
       </button>
-
-      <!-- End Call Button -->
+      <button id="chatToggleBtn" class="icon-btn" onclick="toggleChat()" disabled>
+        <i class="fa-solid fa-comment-dots"></i>
+      </button>
       <button id="endBtn" class="icon-btn end-call" onclick="endCall()" disabled>
         <i class="fa-solid fa-phone-slash"></i>
       </button>
-
-      <!-- Toggle Video Button -->
       <button id="camBtn" class="icon-btn" onclick="toggleCam()" disabled>
         <i class="fa-solid fa-video"></i>
       </button>
@@ -234,7 +279,6 @@
   </div>
 
   <script>
-    // Exact Firebase Configuration
     const firebaseConfig = {
       apiKey: "AIzaSyCiIx-PaKqrZJnrNCy_AzRuAreEWHwAEsY",
       authDomain: "video-call-app-v2.firebaseapp.com",
@@ -257,8 +301,8 @@
     let localStream = null;
     let remoteStream = null;
     let isAudioOnly = false;
+    let activeCallDoc = null;
 
-    // UI Elements
     const localVideo = document.getElementById('localVideo');
     const remoteVideo = document.getElementById('remoteVideo');
     const statusText = document.getElementById('statusText');
@@ -268,8 +312,11 @@
     const micBtn = document.getElementById('micBtn');
     const camBtn = document.getElementById('camBtn');
     const endBtn = document.getElementById('endBtn');
+    const chatToggleBtn = document.getElementById('chatToggleBtn');
+    const chatBox = document.getElementById('chatBox');
+    const chatMessages = document.getElementById('chatMessages');
+    const msgInput = document.getElementById('msgInput');
 
-    // Call Mode Selector (Audio vs Video)
     function setCallMode(mode) {
       if(mode === 'audio') {
         isAudioOnly = true;
@@ -282,13 +329,8 @@
       }
     }
 
-    // Media Access Initialization
     async function initMedia() {
-      const constraints = {
-        audio: true,
-        video: isAudioOnly ? false : true
-      };
-
+      const constraints = { audio: true, video: isAudioOnly ? false : true };
       localStream = await navigator.mediaDevices.getUserMedia(constraints);
       remoteStream = new MediaStream();
 
@@ -307,21 +349,24 @@
       }
 
       micBtn.disabled = false;
-      camBtn.disabled = isAudioOnly; // Disable camera toggle in Audio mode
+      camBtn.disabled = isAudioOnly;
       endBtn.disabled = false;
+      chatToggleBtn.disabled = false;
     }
 
-    // 1. Create Call
+    // 10-Digit Random ID & Create Call
     async function createCall() {
       await initMedia();
       setupPanel.style.display = 'none';
-      statusText.innerText = "Calling / Waiting for receiver...";
+      statusText.innerText = "Waiting for partner...";
 
-      const callDoc = firestore.collection('calls').doc();
-      const offerCandidates = callDoc.collection('offerCandidates');
-      const answerCandidates = callDoc.collection('answerCandidates');
+      const random10DigitId = Math.floor(1000000000 + Math.random() * 9000000000).toString();
+      activeCallDoc = firestore.collection('calls').doc(random10DigitId);
+      
+      const offerCandidates = activeCallDoc.collection('offerCandidates');
+      const answerCandidates = activeCallDoc.collection('answerCandidates');
 
-      roomIdText.innerText = "Room ID: " + callDoc.id;
+      roomIdText.innerText = "Room ID: " + activeCallDoc.id;
 
       pc.onicecandidate = event => {
         event.candidate && offerCandidates.add(event.candidate.toJSON());
@@ -330,9 +375,9 @@
       const offerDescription = await pc.createOffer();
       await pc.setLocalDescription(offerDescription);
 
-      await callDoc.set({ offer: { sdp: offerDescription.sdp, type: offerDescription.type } });
+      await activeCallDoc.set({ offer: { sdp: offerDescription.sdp, type: offerDescription.type } });
 
-      callDoc.onSnapshot(snapshot => {
+      activeCallDoc.onSnapshot(snapshot => {
         const data = snapshot.data();
         if (!pc.currentRemoteDescription && data?.answer) {
           pc.setRemoteDescription(new RTCSessionDescription(data.answer));
@@ -347,33 +392,35 @@
           }
         });
       });
+
+      listenForMessages();
     }
 
-    // 2. Join Call
+    // Join Call with 10-Digit ID
     async function joinCall() {
       const callId = document.getElementById('callInput').value.trim();
-      if (!callId) return alert("Please enter Room ID");
+      if (!callId) return alert("Please enter 10-Digit Room ID");
 
       await initMedia();
       setupPanel.style.display = 'none';
       statusText.innerText = "Connecting...";
 
-      const callDoc = firestore.collection('calls').doc(callId);
-      const answerCandidates = callDoc.collection('answerCandidates');
-      const offerCandidates = callDoc.collection('offerCandidates');
+      activeCallDoc = firestore.collection('calls').doc(callId);
+      const answerCandidates = activeCallDoc.collection('answerCandidates');
+      const offerCandidates = activeCallDoc.collection('offerCandidates');
 
       pc.onicecandidate = event => {
         event.candidate && answerCandidates.add(event.candidate.toJSON());
       };
 
-      const callData = (await callDoc.get()).data();
+      const callData = (await activeCallDoc.get()).data();
       if (!callData) return alert("Invalid Room ID");
 
       await pc.setRemoteDescription(new RTCSessionDescription(callData.offer));
       const answerDescription = await pc.createAnswer();
       await pc.setLocalDescription(answerDescription);
 
-      await callDoc.update({ answer: { type: answerDescription.type, sdp: answerDescription.sdp } });
+      await activeCallDoc.update({ answer: { type: answerDescription.type, sdp: answerDescription.sdp } });
 
       offerCandidates.onSnapshot(snapshot => {
         snapshot.docChanges().forEach(change => {
@@ -385,46 +432,67 @@
 
       statusText.innerText = "Connected";
       roomIdText.innerText = "Room ID: " + callId;
+      listenForMessages();
     }
 
-    // 3. Toggle Mute/Unmute Mic
+    // Chat Functions
+    function toggleChat() {
+      chatBox.style.display = chatBox.style.display === 'flex' ? 'none' : 'flex';
+    }
+
+    async function sendMessage() {
+      const text = msgInput.value.trim();
+      if (!text || !activeCallDoc) return;
+
+      const chatCol = activeCallDoc.collection('chats');
+      await chatCol.add({
+        sender: pc.localDescription.type === 'offer' ? 'caller' : 'receiver',
+        text: text,
+        timestamp: Date.now()
+      });
+
+      msgInput.value = '';
+    }
+
+    function listenForMessages() {
+      const myRole = pc.localDescription.type === 'offer' ? 'caller' : 'receiver';
+      activeCallDoc.collection('chats').orderBy('timestamp').onSnapshot(snapshot => {
+        snapshot.docChanges().forEach(change => {
+          if (change.type === 'added') {
+            const data = change.doc.data();
+            const div = document.createElement('div');
+            div.className = `msg ${data.sender === myRole ? 'outgoing' : 'incoming'}`;
+            div.innerText = data.text;
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+          }
+        });
+      });
+    }
+
     function toggleMic() {
       const audioTrack = localStream.getAudioTracks()[0];
       if (audioTrack) {
         audioTrack.enabled = !audioTrack.enabled;
-        if (audioTrack.enabled) {
-          micBtn.classList.remove('off');
-          micBtn.innerHTML = `<i class="fa-solid fa-microphone"></i>`;
-        } else {
-          micBtn.classList.add('off');
-          micBtn.innerHTML = `<i class="fa-solid fa-microphone-slash"></i>`;
-        }
+        micBtn.classList.toggle('off', !audioTrack.enabled);
+        micBtn.innerHTML = audioTrack.enabled ? `<i class="fa-solid fa-microphone"></i>` : `<i class="fa-solid fa-microphone-slash"></i>`;
       }
     }
 
-    // 4. Toggle Video On/Off
     function toggleCam() {
       if (isAudioOnly) return;
       const videoTrack = localStream.getVideoTracks()[0];
       if (videoTrack) {
         videoTrack.enabled = !videoTrack.enabled;
-        if (videoTrack.enabled) {
-          camBtn.classList.remove('off');
-          camBtn.innerHTML = `<i class="fa-solid fa-video"></i>`;
-        } else {
-          camBtn.classList.add('off');
-          camBtn.innerHTML = `<i class="fa-solid fa-video-slash"></i>`;
-        }
+        camBtn.classList.toggle('off', !videoTrack.enabled);
+        camBtn.innerHTML = videoTrack.enabled ? `<i class="fa-solid fa-video"></i>` : `<i class="fa-solid fa-video-slash"></i>`;
       }
     }
 
-    // 5. End Call / Disconnect
     function endCall() {
-      if (localStream) {
-        localStream.getTracks().forEach(track => track.stop());
-      }
+      if (localStream) localStream.getTracks().forEach(track => track.stop());
       pc.close();
-      window.location.reload(); // Refresh screen to reset state
+      window.location.reload();
     }
   </script>
 </body>
