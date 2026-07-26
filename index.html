@@ -1,1163 +1,239 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Money Transfer - with SMS</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Free WebRTC Video Call</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #121212;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      margin: 0;
+    }
+    h2 { margin-bottom: 20px; }
+    .video-container {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .video-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    video {
+      width: 350px;
+      height: 260px;
+      background-color: #222;
+      border-radius: 12px;
+      border: 2px solid #333;
+      object-fit: cover;
+    }
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+      max-width: 400px;
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+    input, button {
+      padding: 12px;
+      font-size: 15px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+    }
+    input { background: #2b2b2b; color: #fff; border: 1px solid #444; }
+    button { background: #007bff; color: white; cursor: pointer; font-weight: bold; transition: 0.2s; }
+    button:hover { opacity: 0.9; }
+    button:disabled { background: #444; cursor: not-allowed; opacity: 0.6; }
+    .call-btn { background: #28a745; }
+    .join-btn { background: #17a2b8; }
+  </style>
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
-
-        .login-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .login-box {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-        }
-
-        .login-box h1 {
-            color: #333;
-            margin-bottom: 30px;
-        }
-
-        .input-field {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            font-size: 16px;
-        }
-
-        .btn-primary {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .btn-secondary {
-            width: 100%;
-            padding: 10px;
-            background: #f0f0f0;
-            color: #333;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            margin: 10px 0;
-        }
-
-        .demo-text {
-            margin-top: 20px;
-            font-size: 12px;
-            color: #666;
-        }
-
-        .dashboard-container {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        .sidebar {
-            width: 280px;
-            background: linear-gradient(180deg, #2d3e50 0%, #1a2530 100%);
-            color: white;
-            padding: 20px;
-        }
-
-        .sidebar h2 {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .user-info {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .avatar {
-            width: 80px;
-            height: 80px;
-            background: #667eea;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-            margin: 0 auto 15px;
-        }
-
-        .nav-btn {
-            width: 100%;
-            padding: 12px;
-            margin: 5px 0;
-            background: transparent;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            text-align: left;
-            font-size: 16px;
-            transition: background 0.3s;
-        }
-
-        .nav-btn:hover, .nav-btn.active {
-            background: #667eea;
-        }
-
-        .logout-btn {
-            margin-top: 50px;
-            background: #dc3545;
-        }
-
-        .main-content {
-            flex: 1;
-            background: #f5f7fa;
-            padding: 20px;
-            overflow-y: auto;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .balance-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            border-radius: 20px;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .balance-card h1 {
-            font-size: 48px;
-            margin-top: 10px;
-        }
-
-        .transfer-form {
-            background: white;
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .transfer-form label {
-            display: block;
-            margin: 15px 0 5px;
-            font-weight: bold;
-        }
-
-        .receiver-info {
-            background: #e8f5e9;
-            padding: 10px;
-            border-radius: 10px;
-            margin: 10px 0;
-        }
-
-        .info-text {
-            font-size: 12px;
-            color: #666;
-            margin: 10px 0;
-        }
-
-        .history-list {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-        }
-
-        .history-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-        }
-
-        .history-item.sent {
-            border-left: 4px solid #ff4757;
-        }
-
-        .history-item.received {
-            border-left: 4px solid #2ed573;
-        }
-
-        .history-amount.sent {
-            color: #ff4757;
-        }
-
-        .history-amount.received {
-            color: #2ed573;
-        }
-
-        .filter-buttons {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .filter-btn {
-            padding: 8px 16px;
-            background: #f0f0f0;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-        }
-
-        .filter-btn.active {
-            background: #667eea;
-            color: white;
-        }
-
-        .profile-card {
-            background: white;
-            padding: 25px;
-            border-radius: 15px;
-            margin-top: 20px;
-        }
-
-        .profile-card p {
-            padding: 10px 0;
-            border-bottom: 1px solid #eee;
-        }
-
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.9);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 20px;
-            width: 90%;
-            max-width: 400px;
-            padding: 20px;
-            text-align: center;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .close-modal {
-            background: none;
-            border: none;
-            font-size: 28px;
-            cursor: pointer;
-            color: #333;
-        }
-
-        #qr-video {
-            width: 100%;
-            border-radius: 10px;
-            background: #000;
-        }
-
-        .qr-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            padding: 12px 20px;
-            cursor: pointer;
-            font-size: 16px;
-            margin-top: 10px;
-            width: 100%;
-        }
-
-        .scan-result {
-            margin-top: 15px;
-            padding: 10px;
-            border-radius: 10px;
-            display: none;
-        }
-
-        .scan-result.success {
-            background: #d4edda;
-            color: #155724;
-            display: block;
-        }
-
-        .scan-result.error {
-            background: #f8d7da;
-            color: #721c24;
-            display: block;
-        }
-
-        .scan-result.info {
-            background: #d1ecf1;
-            color: #0c5460;
-            display: block;
-        }
-
-        .permission-box {
-            background: #fff3cd;
-            border: 1px solid #ffc107;
-            border-radius: 10px;
-            padding: 15px;
-            margin: 15px 0;
-        }
-
-        .quick-amount {
-            display: flex;
-            gap: 10px;
-            margin: 15px 0;
-            flex-wrap: wrap;
-        }
-
-        .quick-amount-btn {
-            flex: 1;
-            padding: 10px;
-            background: #f0f0f0;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            min-width: 70px;
-        }
-
-        .quick-amount-btn:hover {
-            background: #667eea;
-            color: white;
-        }
-
-        .qr-scan-btn {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
-            margin-bottom: 15px;
-        }
-
-        .my-qr-btn {
-            background: #667eea;
-            color: white;
-            margin-top: 10px;
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-        }
-
-        .sms-toggle {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #f0f0f0;
-            padding: 10px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-        }
-        .sms-toggle label {
-            margin: 0;
-            font-weight: normal;
-        }
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 24px;
-        }
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: 0.4s;
-            border-radius: 34px;
-        }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 18px;
-            width: 18px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: 0.4s;
-            border-radius: 50%;
-        }
-        input:checked + .slider {
-            background-color: #28a745;
-        }
-        input:checked + .slider:before {
-            transform: translateX(26px);
-        }
-
-        @media (max-width: 768px) {
-            .dashboard-container {
-                flex-direction: column;
-            }
-            .sidebar {
-                width: 100%;
-            }
-        }
-    </style>
-    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+  <!-- Firebase Web SDK (v8 Compatible Scripts) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 </head>
 <body>
 
-<!-- LOGIN PAGE -->
-<div id="loginPage">
-    <div class="login-container">
-        <div class="login-box">
-            <h2 style="color:#667eea; margin-bottom:5px;">Growthxpress Xwallet </h2>
-            <h2 style="color:#667eea; margin-bottom:10px;">Money Transfer</h2>
-            <input type="text" id="userId" placeholder="Enter User ID" class="input-field">
-            <input type="password" id="userPassword" placeholder="Password" class="input-field">
-            <button onclick="loginUser()" class="btn-primary">Login</button>
-            <p class="demo-text">Demo Users:<br>user1 / 123456 | user2 / 123456<br>user3 / 123456 | user4 / 123456</p>
-        </div>
+  <h2>Online Video Calling App</h2>
+
+  <div class="video-container">
+    <div class="video-box">
+      <p>Your Video</p>
+      <video id="localVideo" autoplay playsinline muted></video>
     </div>
-</div>
-
-<!-- USER DASHBOARD -->
-<div id="userDashboard" style="display:none;">
-    <div class="dashboard-container">
-        <div class="sidebar">
-            <h2> Growthxpress Xwallet </h2>
-            <div class="user-info">
-                <div class="avatar">👤</div>
-                <h3 id="userName">User Name</h3>
-                <p id="userID">ID: user123</p>
-                <button class="my-qr-btn" onclick="generateMyQR()">📱 My QR Code</button>
-            </div>
-            <nav>
-                <button class="nav-btn active" data-tab="transfer">💸 Transfer Money</button>
-                <button class="nav-btn" data-tab="history">📜 Transfer History</button>
-                <button class="nav-btn" data-tab="profile">👤 My Profile</button>
-                <button class="nav-btn logout-btn" onclick="logout()">🚪 Logout</button>
-            </nav>
-        </div>
-
-        <div class="main-content">
-            <div id="transferTab" class="tab-content active">
-                <h2>Send Money</h2>
-                <div class="balance-card">
-                    <p>Available Balance</p>
-                    <h1 id="balanceAmount">₹0</h1>
-                </div>
-                <div class="transfer-form">
-                    <!-- SMS Toggle Switch -->
-                    <div class="sms-toggle">
-                        <label>📱 Send SMS Notification</label>
-                        <label class="switch">
-                            <input type="checkbox" id="smsToggle" checked>
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                    
-                    <button class="btn-primary qr-scan-btn" onclick="openQRScanner()">📷 Scan QR Code to Pay</button>
-                    <label>Receiver User ID</label>
-                    <input type="text" id="receiverId" placeholder="Enter receiver's User ID" class="input-field">
-                    <button onclick="checkReceiver()" class="btn-secondary">Check Receiver</button>
-                    <div id="receiverInfo" class="receiver-info" style="display:none;">
-                        <p>📌 Receiver: <strong id="receiverName"></strong></p>
-                        <p>📱 Receiver Phone: <strong id="receiverPhone"></strong></p>
-                    </div>
-                    <label>Amount (₹)</label>
-                    <div class="quick-amount">
-                        <button type="button" class="quick-amount-btn" onclick="setQuickAmount(100)">₹100</button>
-                        <button type="button" class="quick-amount-btn" onclick="setQuickAmount(500)">₹500</button>
-                        <button type="button" class="quick-amount-btn" onclick="setQuickAmount(1000)">₹1000</button>
-                        <button type="button" class="quick-amount-btn" onclick="setQuickAmount(2000)">₹2000</button>
-                    </div>
-                    <input type="number" id="amount" placeholder="Enter amount" class="input-field" min="10">
-                    <p class="info-text">Minimum Transfer: ₹10 | Instant Transfer</p>
-                    <button onclick="transferMoney()" class="btn-primary">💸 Transfer Now</button>
-                </div>
-            </div>
-
-            <div id="historyTab" class="tab-content">
-                <h2>Transfer History</h2>
-                <div class="filter-buttons">
-                    <button class="filter-btn active" data-filter="all" onclick="filterHistory('all')">All</button>
-                    <button class="filter-btn" data-filter="sent" onclick="filterHistory('sent')">Sent</button>
-                    <button class="filter-btn" data-filter="received" onclick="filterHistory('received')">Received</button>
-                </div>
-                <div id="historyList" class="history-list"></div>
-            </div>
-
-            <div id="profileTab" class="tab-content">
-                <h2>My Profile</h2>
-                <div class="profile-card">
-                    <p><strong>User ID:</strong> <span id="profileUserId"></span></p>
-                    <p><strong>Name:</strong> <span id="profileName"></span></p>
-                    <p><strong>Email:</strong> <span id="profileEmail"></span></p>
-                    <p><strong>Phone:</strong> <span id="profilePhone"></span></p>
-                    <p><strong>Balance:</strong> <span id="profileBalance"></span></p>
-                    <p><strong>Member Since:</strong> <span id="profileSince"></span></p>
-                </div>
-            </div>
-        </div>
+    <div class="video-box">
+      <p>Remote User</p>
+      <video id="remoteVideo" autoplay playsinline></video>
     </div>
-</div>
+  </div>
 
-<!-- QR Scanner Modal -->
-<div id="qrModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>Scan QR Code</h3>
-            <button class="close-modal" onclick="closeQRScanner()">&times;</button>
-        </div>
-        <video id="qr-video" autoplay playsinline style="width:100%; border-radius:10px; background:#000;"></video>
-        <canvas id="qr-canvas" style="display:none;"></canvas>
-        <div id="permissionMessage" class="permission-box" style="display:none;">
-            <p>📷 Camera permission required</p>
-            <button onclick="requestCameraPermission()" style="background:#007bff; color:white; border:none; padding:8px 16px; border-radius:8px;">Allow Camera</button>
-        </div>
-        <div id="scanResult" class="scan-result"></div>
-        <p style="font-size:12px;color:#666;margin-top:10px;">Scan receiver's QR code to pay instantly</p>
-        <button onclick="closeQRScanner()" class="qr-btn">Cancel</button>
-    </div>
-</div>
+  <div class="controls">
+    <button id="webcamBtn" onclick="startWebcam()">1. Camera On Karo</button>
+    <button id="callBtn" class="call-btn" onclick="createCall()" disabled>2. Naya Call Start Karo (Create Room)</button>
+    
+    <hr style="width: 100%; border-color: #333; margin: 10px 0;">
 
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <input type="text" id="callInput" placeholder="Room ID Yahan Daalo">
+    <button id="answerBtn" class="join-btn" onclick="joinCall()" disabled>3. Call Join Karo</button>
+  </div>
 
-<script>
-// ============ FIREBASE CONFIGURATION ============
-const firebaseConfig = {
-    apiKey: "AIzaSyC6NlviruSjmmoj_gE6nZkBHdfq69t2PcA",
-    authDomain: "apstore-426b2.firebaseapp.com",
-    databaseURL: "https://apstore-426b2-default-rtdb.firebaseio.com",
-    projectId: "apstore-426b2",
-    storageBucket: "apstore-426b2.appspot.com",
-    messagingSenderId: "689506328225",
-    appId: "1:689506328225:android:ee42613596f2f2c1881ae0"
-};
+  <script>
+    // Aapki 100% Exact Config Keys:
+    const firebaseConfig = {
+      apiKey: "AIzaSyCiIx-PaKqrZJnrNCy_AzRuAreEWHwAEsY",
+      authDomain: "video-call-app-v2.firebaseapp.com",
+      projectId: "video-call-app-v2",
+      storageBucket: "video-call-app-v2.firebasestorage.app",
+      messagingSenderId: "218235608788",
+      appId: "1:218235608788:web:0c525518e73edce88be541",
+      measurementId: "G-JHYXE20WRB"
+    };
 
-firebase.initializeApp(firebaseConfig);
-const database = firebase.database();
-
-let currentUser = null;
-let currentUserData = null;
-let allUserTransfers = [];
-let balanceListener = null; // Store listener reference
-
-// ============ SMS FUNCTION ============
-function sendSMS(phoneNumber, message) {
-    if (!phoneNumber || phoneNumber === 'Not set') {
-        console.log("No phone number available");
-        return false;
+    // Firebase Initialize
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
     }
-    
-    let cleanNumber = phoneNumber.toString().replace(/\s/g, '');
-    const smsUrl = `sms:${cleanNumber}?body=${encodeURIComponent(message)}`;
-    
-    try {
-        window.location.href = smsUrl;
-        return true;
-    } catch(e) {
-        console.log("SMS failed:", e);
-        return false;
-    }
-}
+    const firestore = firebase.firestore();
 
-function sendTransferSMS(senderName, receiverName, amount, receiverPhone, senderPhone, type) {
-    const smsToggle = document.getElementById('smsToggle');
-    if (!smsToggle.checked) {
-        console.log("SMS notifications disabled");
-        return;
-    }
-    
-    if (type === 'sent') {
-        const senderMessage = `💰 TRANSACTION ALERT\n\nDear ${senderName},\n\nYou have sent ₹${amount.toLocaleString()} to ${receiverName}.\n\n✅ Transaction Successful\n📅 Date: ${new Date().toLocaleString()}\n\nThank you for using our service!`;
-        
-        if (senderPhone && senderPhone !== 'Not set') {
-            sendSMS(senderPhone, senderMessage);
-        }
-        
-        const receiverMessage = `💰 TRANSACTION ALERT\n\nDear ${receiverName},\n\nYou have received ₹${amount.toLocaleString()} from ${senderName}.\n\n✅ Amount Credited\n📅 Date: ${new Date().toLocaleString()}\n\nThank you for using our service!`;
-        
-        if (receiverPhone && receiverPhone !== 'Not set') {
-            setTimeout(() => {
-                sendSMS(receiverPhone, receiverMessage);
-            }, 500);
-        }
-    }
-}
+    // Google STUN Server (Free)
+    const servers = {
+      iceServers: [
+        { urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'] }
+      ],
+      iceCandidatePoolSize: 10,
+    };
 
-// ============ UPDATE BALANCE DISPLAY (FIXED) ============
-function updateBalanceDisplay(balance) {
-    const formattedBalance = '₹' + (balance || 0).toLocaleString();
-    document.getElementById('balanceAmount').innerHTML = formattedBalance;
-    document.getElementById('profileBalance').innerHTML = formattedBalance;
-    
-    // Also update currentUserData
-    if (currentUserData) {
-        currentUserData.balance = balance;
-    }
-}
+    let pc = new RTCPeerConnection(servers);
+    let localStream = null;
+    let remoteStream = null;
 
-// ============ SETUP REAL-TIME BALANCE LISTENER ============
-function setupBalanceListener(userId) {
-    // Remove existing listener if any
-    if (balanceListener) {
-        balanceListener.off();
-    }
-    
-    // Set up new real-time listener
-    balanceListener = database.ref('Users/' + userId + '/balance');
-    balanceListener.on('value', (snapshot) => {
-        const newBalance = snapshot.val();
-        if (newBalance !== null && newBalance !== undefined) {
-            updateBalanceDisplay(newBalance);
-            console.log("Balance updated in real-time:", newBalance);
-        }
-    });
-}
+    const localVideo = document.getElementById('localVideo');
+    const remoteVideo = document.getElementById('remoteVideo');
+    const webcamBtn = document.getElementById('webcamBtn');
+    const callBtn = document.getElementById('callBtn');
+    const answerBtn = document.getElementById('answerBtn');
+    const callInput = document.getElementById('callInput');
 
-// ============ QR CODE SCANNER ============
-let video = null;
-let stream = null;
-let scanning = false;
-let animationId = null;
+    // 1. Camera Start Karo
+    async function startWebcam() {
+      try {
+        localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        remoteStream = new MediaStream();
 
-async function openQRScanner() {
-    const modal = document.getElementById('qrModal');
-    modal.style.display = 'flex';
-    document.getElementById('permissionMessage').style.display = 'none';
-    document.getElementById('scanResult').style.display = 'none';
-    startCamera();
-}
+        localStream.getTracks().forEach((track) => pc.addTrack(track, localStream));
 
-async function startCamera() {
-    video = document.getElementById('qr-video');
-    const canvas = document.getElementById('qr-canvas');
-    const context = canvas.getContext('2d');
-    stopCamera();
-
-    try {
-        stream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode: { ideal: "environment" } },
-            audio: false
-        });
-        video.srcObject = stream;
-        video.setAttribute("playsinline", true);
-        video.style.display = 'block';
-        await video.play();
-        scanning = true;
-        showQRResult("🔍 Scanning QR Code...", "info");
-
-        function scanFrame() {
-            if (!scanning) return;
-            if (video.readyState === video.HAVE_ENOUGH_DATA) {
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-                const code = jsQR(imageData.data, canvas.width, canvas.height);
-                if (code) {
-                    handleQRScan(code.data);
-                    closeQRScanner();
-                    return;
-                }
-            }
-            animationId = requestAnimationFrame(scanFrame);
-        }
-        scanFrame();
-    } catch (err) {
-        console.log("Camera Error:", err);
-        document.getElementById('permissionMessage').style.display = 'block';
-        showQRResult("❌ Camera access denied. Please allow camera permission.", "error");
-    }
-}
-
-function stopCamera() {
-    scanning = false;
-    if (animationId) {
-        cancelAnimationFrame(animationId);
-        animationId = null;
-    }
-    if (stream) {
-        stream.getTracks().forEach(track => track.stop());
-        stream = null;
-    }
-    if (video) {
-        video.pause();
-        video.srcObject = null;
-        video.style.display = 'none';
-    }
-}
-
-function closeQRScanner() {
-    stopCamera();
-    document.getElementById('qrModal').style.display = 'none';
-    document.getElementById('scanResult').style.display = 'none';
-    document.getElementById('permissionMessage').style.display = 'none';
-}
-
-function requestCameraPermission() {
-    startCamera();
-}
-
-function handleQRScan(decodedText) {
-    try {
-        let receiverId = decodedText;
-        let amount = null;
-        if (decodedText.includes('|')) {
-            const parts = decodedText.split('|');
-            receiverId = parts[0];
-            amount = parseInt(parts[1]);
-        }
-        if (decodedText.startsWith('{')) {
-            const data = JSON.parse(decodedText);
-            receiverId = data.userId || data.id;
-            amount = data.amount || null;
-        }
-        document.getElementById('receiverId').value = receiverId;
-        if (amount && !isNaN(amount)) {
-            document.getElementById('amount').value = amount;
-        }
-        showQRResult(`✅ Receiver: ${receiverId} detected!`, "success");
-        setTimeout(() => {
-            checkReceiver();
-        }, 500);
-    } catch (e) {
-        showQRResult("❌ Invalid QR code", "error");
-    }
-}
-
-function showQRResult(message, type) {
-    const resultDiv = document.getElementById('scanResult');
-    resultDiv.innerHTML = message;
-    resultDiv.className = `scan-result ${type}`;
-    resultDiv.style.display = 'block';
-    if (type !== "info") {
-        setTimeout(() => {
-            resultDiv.style.display = 'none';
-        }, 3000);
-    }
-}
-
-// ============ GENERATE MY QR CODE ============
-function generateMyQR() {
-    if (!currentUser) {
-        alert("Please login first");
-        return;
-    }
-    
-    const qrData = currentUser;
-    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=10&data=${encodeURIComponent(qrData)}`;
-    
-    const qrPopup = window.open();
-    qrPopup.document.write(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>My QR Code - ${currentUser}</title>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-            <style>
-                * { margin: 0; padding: 0; box-sizing: border-box; }
-                body {
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    min-height: 100vh;
-                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                    margin: 0;
-                    padding: 20px;
-                }
-                .qr-container {
-                    background: white;
-                    padding: 30px;
-                    border-radius: 25px;
-                    box-shadow: 0 25px 50px rgba(0,0,0,0.3);
-                    max-width: 400px;
-                    width: 100%;
-                    text-align: center;
-                }
-                h2 { color: #333; margin-bottom: 10px; font-size: 24px; }
-                .subtitle { color: #667eea; margin-bottom: 20px; font-size: 14px; }
-                .qr-image {
-                    background: white;
-                    padding: 15px;
-                    border-radius: 20px;
-                    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-                    display: inline-block;
-                    margin: 15px 0;
-                }
-                .qr-image img { width: 250px; height: 250px; display: block; }
-                .user-info {
-                    margin-top: 20px;
-                    text-align: left;
-                    background: #f8f9fa;
-                    padding: 15px;
-                    border-radius: 15px;
-                }
-                .user-info p {
-                    padding: 8px 0;
-                    border-bottom: 1px solid #e0e0e0;
-                    display: flex;
-                    justify-content: space-between;
-                }
-                .user-info p:last-child { border-bottom: none; }
-                .balance { color: #28a745; font-weight: bold; }
-                .scan-hint {
-                    background: #e8f5e9;
-                    color: #2e7d32;
-                    padding: 10px;
-                    border-radius: 10px;
-                    margin: 15px 0;
-                    font-size: 14px;
-                }
-                .button-group {
-                    display: flex;
-                    gap: 10px;
-                    margin-top: 20px;
-                }
-                button {
-                    flex: 1;
-                    padding: 12px;
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                    color: white;
-                    border: none;
-                    border-radius: 12px;
-                    cursor: pointer;
-                    font-weight: 600;
-                }
-                .btn-print { background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%); }
-                .btn-close { background: linear-gradient(135deg, #747d8c 0%, #2f3542 100%); }
-                .share-text { margin-top: 15px; font-size: 11px; color: #999; }
-                @media (max-width: 480px) {
-                    .qr-container { padding: 20px; }
-                    .qr-image img { width: 200px; height: 200px; }
-                }
-            </style>
-        </head>
-        <body>
-            <div class="qr-container">
-                <h2>💰 My Payment QR Code</h2>
-                <div class="subtitle">Scan & Pay Instantly</div>
-                <div class="qr-image">
-                    <img src="${qrUrl}" alt="My QR Code" id="qrImg">
-                </div>
-                <div class="user-info">
-                    <p><strong>👤 User ID:</strong> <span>${currentUser}</span></p>
-                    <p><strong>📛 Name:</strong> <span>${currentUserData ? currentUserData.name : ''}</span></p>
-                    <p><strong>💰 Balance:</strong> <span class="balance">₹${currentUserData ? currentUserData.balance.toLocaleString() : '0'}</span></p>
-                    <p><strong>📧 Email:</strong> <span>${currentUserData ? currentUserData.email : 'Not set'}</span></p>
-                    <p><strong>📱 Phone:</strong> <span>${currentUserData ? currentUserData.phone : 'Not set'}</span></p>
-                </div>
-                <div class="scan-hint">✨ Scan this QR code to send money directly to me</div>
-                <div class="button-group">
-                    <button class="btn-print" onclick="window.print()">🖨️ Print</button>
-                    <button class="btn-close" onclick="window.close()">❌ Close</button>
-                </div>
-                <div class="share-text">Share this QR code with anyone to receive payments</div>
-            </div>
-        </body>
-        </html>
-    `);
-}
-
-function setQuickAmount(amount) {
-    document.getElementById('amount').value = amount;
-}
-
-// ============ INITIALIZE SAMPLE DATA ============
-function initializeSampleData() {
-    database.ref('Users/user1').once('value').then((snapshot) => {
-        if(!snapshot.exists()) {
-            const sampleUsers = {
-                "user1": { name: "Raj Sharma", email: "raj@example.com", phone: "9876543210", balance: 10000, password: "123456", createdAt: new Date().toISOString() },
-                "user2": { name: "Priya Patel", email: "priya@example.com", phone: "9876543211", balance: 5000, password: "123456", createdAt: new Date().toISOString() },
-                "user3": { name: "Amit Kumar", email: "amit@example.com", phone: "9876543212", balance: 7500, password: "123456", createdAt: new Date().toISOString() },
-                "user4": { name: "Neha Singh", email: "neha@example.com", phone: "9876543213", balance: 3000, password: "123456", createdAt: new Date().toISOString() }
-            };
-            database.ref('Users').set(sampleUsers);
-        }
-    });
-}
-
-// ============ LOGIN FUNCTION ============
-function loginUser() {
-    const userId = document.getElementById('userId').value;
-    const password = document.getElementById('userPassword').value;
-    
-    if(!userId || !password) { alert('Please enter User ID and Password'); return; }
-    
-    database.ref('Users/' + userId).once('value').then((snapshot) => {
-        if(snapshot.exists() && snapshot.child('password').val() === password) {
-            currentUser = userId;
-            currentUserData = snapshot.val();
-            localStorage.setItem('currentUser', userId);
-            document.getElementById('loginPage').style.display = 'none';
-            document.getElementById('userDashboard').style.display = 'block';
-            
-            // Setup real-time balance listener first
-            setupBalanceListener(userId);
-            
-            loadUserData(userId);
-            loadTransferHistory(userId);
-            setupUserEvents();
-        } else {
-            alert('Invalid credentials!\nDemo: user1/123456');
-        }
-    });
-}
-
-function loadUserData(userId) {
-    database.ref('Users/' + userId).once('value').then((snapshot) => {
-        if(snapshot.exists()) {
-            const data = snapshot.val();
-            document.getElementById('userName').innerText = data.name;
-            document.getElementById('userID').innerText = 'ID: ' + userId;
-            updateBalanceDisplay(data.balance || 0);
-            document.getElementById('profileUserId').innerText = userId;
-            document.getElementById('profileName').innerText = data.name;
-            document.getElementById('profileEmail').innerText = data.email || 'Not set';
-            document.getElementById('profilePhone').innerText = data.phone || 'Not set';
-            document.getElementById('profileSince').innerText = data.createdAt ? new Date(data.createdAt).toLocaleDateString() : new Date().toLocaleDateString();
-        }
-    });
-}
-
-function checkReceiver() {
-    const receiverId = document.getElementById('receiverId').value;
-    if(!receiverId) { alert('Please enter Receiver ID'); return; }
-    
-    database.ref('Users/' + receiverId).once('value').then((snapshot) => {
-        if(snapshot.exists()) {
-            const receiverData = snapshot.val();
-            document.getElementById('receiverInfo').style.display = 'block';
-            document.getElementById('receiverName').innerHTML = receiverData.name;
-            document.getElementById('receiverPhone').innerHTML = receiverData.phone || 'Not set';
-        } else {
-            alert('User not found!');
-            document.getElementById('receiverInfo').style.display = 'none';
-        }
-    });
-}
-
-// ============ TRANSFER FUNCTION (FIXED) ============
-function transferMoney() {
-    const receiverId = document.getElementById('receiverId').value;
-    const amount = parseInt(document.getElementById('amount').value);
-    const senderId = currentUser;
-    
-    if(!receiverId || !amount) { alert('Please fill all fields'); return; }
-    if(amount < 10) { alert('Minimum transfer amount is ₹10'); return; }
-    
-    // Use current balance from currentUserData (which is updated by real-time listener)
-    const currentBalance = currentUserData ? currentUserData.balance : 0;
-    if(amount > currentBalance) { alert('Insufficient balance! Your balance is ₹' + currentBalance.toLocaleString()); return; }
-    if(receiverId === senderId) { alert('Cannot transfer to yourself!'); return; }
-    
-    // Disable button to prevent double transfer
-    const btn = event.target;
-    const originalText = btn.innerText;
-    btn.innerText = 'Processing...';
-    btn.disabled = true;
-    
-    database.ref('Users/' + receiverId).once('value').then((snapshot) => {
-        if(!snapshot.exists()) { 
-            alert('Receiver not found!'); 
-            btn.innerText = originalText;
-            btn.disabled = false;
-            return; 
-        }
-        
-        const receiverData = snapshot.val();
-        const transactionId = Date.now() + '_' + senderId + '_' + Math.random().toString(36).substr(2, 5);
-        const timestamp = new Date().toISOString();
-        
-        const senderNewBalance = currentBalance - amount;
-        const receiverNewBalance = (receiverData.balance || 0) + amount;
-        
-        const updates = {};
-        updates['Users/' + senderId + '/balance'] = senderNewBalance;
-        updates['Users/' + receiverId + '/balance'] = receiverNewBalance;
-        updates['Transfer_History/' + transactionId] = {
-            fromUserId: senderId, toUserId: receiverId,
-            fromUserName: currentUserData.name, toUserName: receiverData.name,
-            amount: amount, timestamp: timestamp, status: 'success'
+        pc.ontrack = (event) => {
+          event.streams[0].getTracks().forEach((track) => {
+            remoteStream.addTrack(track);
+          });
         };
-        updates['User_Transfers/' + senderId + '/' + transactionId] = {
-            toUserId: receiverId, toUserName: receiverData.name,
-            amount: amount, timestamp: timestamp, type: 'sent'
-        };
-        updates['User_Transfers/' + receiverId + '/' + transactionId] = {
-            fromUserId: senderId, fromUserName: currentUserData.name,
-            amount: amount, timestamp: timestamp, type: 'received'
-        };
-        
-        database.ref().update(updates).then(() => {
-            alert('✅ Transfer successful! ₹' + amount.toLocaleString() + ' sent to ' + receiverData.name);
-            
-            sendTransferSMS(
-                currentUserData.name,
-                receiverData.name,
-                amount,
-                receiverData.phone,
-                currentUserData.phone,
-                'sent'
-            );
-            
-            // Clear form
-            document.getElementById('receiverId').value = '';
-            document.getElementById('amount').value = '';
-            document.getElementById('receiverInfo').style.display = 'none';
-            
-            // Reload history
-            loadTransferHistory(senderId);
-            
-            btn.innerText = originalText;
-            btn.disabled = false;
-        }).catch((error) => {
-            alert('❌ Transfer failed: ' + error.message);
-            btn.innerText = originalText;
-            btn.disabled = false;
-        });
-    }).catch((error) => {
-        alert('❌ Error: ' + error.message);
-        btn.innerText = originalText;
-        btn.disabled = false;
-    });
-}
 
-function loadTransferHistory(userId) {
-    database.ref('User_Transfers/' + userId).once('value').then((snapshot) => {
-        const historyList = document.getElementById('historyList');
-        historyList.innerHTML = '';
-        allUserTransfers = [];
-        
-        if(!snapshot.exists()) {
-            historyList.innerHTML = '<div style="text-align:center;padding:40px;">📭 No transfers yet</div>';
-            return;
+        localVideo.srcObject = localStream;
+        remoteVideo.srcObject = remoteStream;
+
+        callBtn.disabled = false;
+        answerBtn.disabled = false;
+        webcamBtn.disabled = true;
+      } catch (err) {
+        alert("Camera and Microphone permission required!");
+        console.error(err);
+      }
+    }
+
+    // 2. Room Banayein (Caller)
+    async function createCall() {
+      const callDoc = firestore.collection('calls').doc();
+      const offerCandidates = callDoc.collection('offerCandidates');
+      const answerCandidates = callDoc.collection('answerCandidates');
+
+      callInput.value = callDoc.id;
+
+      pc.onicecandidate = (event) => {
+        event.candidate && offerCandidates.add(event.candidate.toJSON());
+      };
+
+      const offerDescription = await pc.createOffer();
+      await pc.setLocalDescription(offerDescription);
+
+      const offer = {
+        sdp: offerDescription.sdp,
+        type: offerDescription.type,
+      };
+
+      await callDoc.set({ offer });
+
+      callDoc.onSnapshot((snapshot) => {
+        const data = snapshot.data();
+        if (!pc.currentRemoteDescription && data?.answer) {
+          const answerDescription = new RTCSessionDescription(data.answer);
+          pc.setRemoteDescription(answerDescription);
         }
-        
-        snapshot.forEach((child) => {
-            allUserTransfers.push({id: child.key, ...child.val()});
+      });
+
+      answerCandidates.onSnapshot((snapshot) => {
+        snapshot.docChanges().forEach((change) => {
+          if (change.type === 'added') {
+            const candidate = new RTCIceCandidate(change.doc.data());
+            pc.addIceCandidate(candidate);
+          }
         });
-        allUserTransfers.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-        displayUserTransfers('all');
-    });
-}
+      });
 
-function displayUserTransfers(filter) {
-    const historyList = document.getElementById('historyList');
-    historyList.innerHTML = '';
-    
-    let filtered = allUserTransfers;
-    if(filter !== 'all') {
-        filtered = allUserTransfers.filter(t => t.type === filter);
+      alert("Room ID: " + callDoc.id + "\nIs Room ID ko join karne wale user ke paas bhejo!");
     }
-    
-    if(filtered.length === 0) {
-        historyList.innerHTML = '<div style="text-align:center;padding:40px;">📭 No ' + filter + ' transfers</div>';
-        return;
-    }
-    
-    filtered.forEach(transfer => {
-        const div = document.createElement('div');
-        div.className = `history-item ${transfer.type}`;
-        const amountSymbol = transfer.type === 'sent' ? '- ₹' : '+ ₹';
-        const amountClass = transfer.type === 'sent' ? 'sent' : 'received';
-        const otherPerson = transfer.type === 'sent' ? transfer.toUserName : transfer.fromUserName;
-        div.innerHTML = `
-            <div>
-                <strong>${transfer.type === 'sent' ? 'Sent to' : 'Received from'}</strong>
-                <div style="font-weight:600;margin:5px 0;">${otherPerson}</div>
-                <small>${new Date(transfer.timestamp).toLocaleString()}</small>
-            </div>
-            <div class="history-amount ${amountClass}">
-                ${amountSymbol}${transfer.amount.toLocaleString()}
-            </div>
-        `;
-        historyList.appendChild(div);
-    });
-}
 
-function filterHistory(filter) {
-    const btn = event.target;
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    displayUserTransfers(filter);
-}
+    // 3. Call Join Karein (Receiver)
+    async function joinCall() {
+      const callId = callInput.value;
+      if(!callId) return alert("Pehle Room ID daalo!");
 
-function setupUserEvents() {
-    document.querySelectorAll('#userDashboard .nav-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const tab = btn.dataset.tab;
-            document.querySelectorAll('#userDashboard .nav-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            document.querySelectorAll('#userDashboard .tab-content').forEach(t => t.classList.remove('active'));
-            document.getElementById(tab + 'Tab').classList.add('active');
+      const callDoc = firestore.collection('calls').doc(callId);
+      const answerCandidates = callDoc.collection('answerCandidates');
+      const offerCandidates = callDoc.collection('offerCandidates');
+
+      pc.onicecandidate = (event) => {
+        event.candidate && answerCandidates.add(event.candidate.toJSON());
+      };
+
+      const callData = (await callDoc.get()).data();
+      if (!callData) return alert("Galat Room ID!");
+
+      const offerDescription = callData.offer;
+      await pc.setRemoteDescription(new RTCSessionDescription(offerDescription));
+
+      const answerDescription = await pc.createAnswer();
+      await pc.setLocalDescription(answerDescription);
+
+      const answer = {
+        type: answerDescription.type,
+        sdp: answerDescription.sdp,
+      };
+
+      await callDoc.update({ answer });
+
+      offerCandidates.onSnapshot((snapshot) => {
+        snapshot.docChanges().forEach((change) => {
+          if (change.type === 'added') {
+            let data = change.doc.data();
+            pc.addIceCandidate(new RTCIceCandidate(data));
+          }
         });
-    });
-}
-
-function logout() {
-    // Remove balance listener
-    if (balanceListener) {
-        balanceListener.off();
-        balanceListener = null;
+      });
     }
-    stopCamera();
-    localStorage.clear();
-    currentUser = null;
-    currentUserData = null;
-    document.getElementById('loginPage').style.display = 'flex';
-    document.getElementById('userDashboard').style.display = 'none';
-    document.getElementById('userId').value = '';
-    document.getElementById('userPassword').value = '';
-}
-
-// Initialize
-initializeSampleData();
-</script>
-
+  </script>
 </body>
 </html>
