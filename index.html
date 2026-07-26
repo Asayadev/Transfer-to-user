@@ -34,12 +34,48 @@
       border: 1px solid #333;
     }
 
+    /* Auth Screen UI */
+    .auth-container {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: #121212;
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 25px;
+      gap: 15px;
+    }
+    .auth-container h2 { text-align: center; color: #28a745; margin-bottom: 10px; }
+    .auth-container input {
+      padding: 12px;
+      background: #222;
+      border: 1px solid #444;
+      color: #fff;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    .auth-container button {
+      padding: 12px;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 15px;
+    }
+
     .call-header {
-      padding: 20px;
+      padding: 15px;
       text-align: center;
       z-index: 10;
       background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
+    .user-info { font-size: 12px; color: #007bff; margin-bottom: 4px; }
     .call-status { font-size: 13px; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
     .room-display { font-size: 16px; font-weight: bold; color: #28a745; margin-top: 3px; }
 
@@ -52,12 +88,7 @@
       align-items: center;
     }
 
-    #remoteVideo {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
+    #remoteVideo { width: 100%; height: 100%; object-fit: cover; }
     #localVideo {
       position: absolute;
       top: 15px;
@@ -81,14 +112,14 @@
     }
     .avatar-placeholder i { font-size: 70px; color: #555; margin-bottom: 10px; }
 
-    /* Chat Overlay Box */
+    /* Chat Overlay */
     .chat-box {
       position: absolute;
       bottom: 100px;
       left: 10px;
       right: 10px;
       height: 180px;
-      background: rgba(0, 0, 0, 0.75);
+      background: rgba(0, 0, 0, 0.85);
       backdrop-filter: blur(5px);
       border-radius: 12px;
       display: none;
@@ -110,10 +141,7 @@
     .msg.incoming { background: #333; align-self: flex-start; }
     .msg.outgoing { background: #007bff; align-self: flex-end; }
     
-    .chat-input-area {
-      display: flex;
-      gap: 5px;
-    }
+    .chat-input-area { display: flex; gap: 5px; }
     .chat-input-area input {
       flex: 1;
       padding: 8px;
@@ -122,7 +150,6 @@
       border: 1px solid #444;
       color: #fff;
       border-radius: 6px;
-      text-align: left;
     }
     .chat-input-area button {
       padding: 8px 12px;
@@ -148,82 +175,56 @@
       border: 1px solid #333;
     }
 
-    .mode-selector {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-      margin-bottom: 5px;
-    }
+    .mode-selector { display: flex; gap: 10px; justify-content: center; margin-bottom: 5px; }
     .mode-btn {
-      flex: 1;
-      padding: 8px;
-      font-size: 13px;
-      background: #333;
-      color: #ccc;
-      border: 1px solid #444;
-      border-radius: 8px;
-      cursor: pointer;
+      flex: 1; padding: 8px; font-size: 13px; background: #333; color: #ccc;
+      border: 1px solid #444; border-radius: 8px; cursor: pointer;
     }
     .mode-btn.active { background: #007bff; color: #fff; border-color: #007bff; }
 
     input.main-input {
-      padding: 12px;
-      background: #2a2a2a;
-      border: 1px solid #444;
-      color: #fff;
-      border-radius: 8px;
-      font-size: 15px;
-      text-align: center;
+      padding: 12px; background: #2a2a2a; border: 1px solid #444; color: #fff;
+      border-radius: 8px; font-size: 15px; text-align: center;
     }
 
     .btn-action {
-      padding: 12px;
-      border: none;
-      border-radius: 8px;
-      font-weight: bold;
-      color: white;
-      cursor: pointer;
-      font-size: 14px;
+      padding: 12px; border: none; border-radius: 8px; font-weight: bold; color: white; cursor: pointer; font-size: 14px;
     }
     .btn-create { background: #28a745; }
     .btn-join { background: #17a2b8; }
 
     .controls-bar {
-      height: 90px;
-      background: rgba(0,0,0,0.9);
-      display: flex;
-      justify-content: space-evenly;
-      align-items: center;
-      padding-bottom: 10px;
-      z-index: 10;
+      height: 90px; background: rgba(0,0,0,0.9); display: flex; justify-content: space-evenly; align-items: center; padding-bottom: 10px; z-index: 10;
     }
 
     .icon-btn {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      border: none;
-      background: #333;
-      color: white;
-      font-size: 18px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      cursor: pointer;
-      transition: 0.2s;
+      width: 50px; height: 50px; border-radius: 50%; border: none; background: #333; color: white;
+      font-size: 18px; display: flex; justify-content: center; align-items: center; cursor: pointer;
     }
-    .icon-btn:hover { opacity: 0.8; }
     .icon-btn.off { background: #dc3545; }
     .icon-btn.end-call { background: #dc3545; width: 60px; height: 60px; font-size: 22px; }
   </style>
 
+  <!-- Firebase Scripts -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 </head>
 <body>
 
   <div class="phone-screen">
+    
+    <!-- Login Screen -->
+    <div id="authScreen" class="auth-container">
+      <h2><i class="fa-solid fa-user-lock"></i> Login / Register</h2>
+      <input type="email" id="authEmail" placeholder="Enter Email">
+      <input type="password" id="authPass" placeholder="Enter Password">
+      <button onclick="handleAuth()">Continue</button>
+    </div>
+
+    <!-- Main App Screen -->
     <div class="call-header">
+      <div id="userEmailText" class="user-info"></div>
       <div id="statusText" class="call-status">Ready to Call</div>
       <div id="roomIdText" class="room-display"></div>
     </div>
@@ -237,7 +238,7 @@
         <p>Voice Call</p>
       </div>
 
-      <!-- Chat UI Overlay -->
+      <!-- Chat Box Overlay -->
       <div id="chatBox" class="chat-box">
         <div id="chatMessages" class="chat-messages"></div>
         <div class="chat-input-area">
@@ -290,6 +291,7 @@
     };
 
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
     const firestore = firebase.firestore();
 
     const servers = {
@@ -302,20 +304,34 @@
     let remoteStream = null;
     let isAudioOnly = false;
     let activeCallDoc = null;
+    let currentUser = null;
 
-    const localVideo = document.getElementById('localVideo');
-    const remoteVideo = document.getElementById('remoteVideo');
-    const statusText = document.getElementById('statusText');
-    const roomIdText = document.getElementById('roomIdText');
-    const setupPanel = document.getElementById('setupPanel');
-    const avatarBox = document.getElementById('avatarBox');
-    const micBtn = document.getElementById('micBtn');
-    const camBtn = document.getElementById('camBtn');
-    const endBtn = document.getElementById('endBtn');
-    const chatToggleBtn = document.getElementById('chatToggleBtn');
-    const chatBox = document.getElementById('chatBox');
-    const chatMessages = document.getElementById('chatMessages');
-    const msgInput = document.getElementById('msgInput');
+    // Login Handle Logic
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        currentUser = user;
+        document.getElementById('authScreen').style.display = 'none';
+        document.getElementById('userEmailText').innerText = "Logged in: " + user.email;
+      } else {
+        document.getElementById('authScreen').style.display = 'flex';
+      }
+    });
+
+    async function handleAuth() {
+      const email = document.getElementById('authEmail').value.trim();
+      const pass = document.getElementById('authPass').value.trim();
+      if (!email || !pass) return alert("Please enter email and password!");
+
+      try {
+        await auth.signInWithEmailAndPassword(email, pass);
+      } catch (e) {
+        try {
+          await auth.createUserWithEmailAndPassword(email, pass);
+        } catch (err) {
+          alert(err.message);
+        }
+      }
+    }
 
     function setCallMode(mode) {
       if(mode === 'audio') {
@@ -341,24 +357,24 @@
       };
 
       if (!isAudioOnly) {
-        localVideo.srcObject = localStream;
-        remoteVideo.srcObject = remoteStream;
+        document.getElementById('localVideo').srcObject = localStream;
+        document.getElementById('remoteVideo').srcObject = remoteStream;
       } else {
-        avatarBox.style.display = 'flex';
-        localVideo.style.display = 'none';
+        document.getElementById('avatarBox').style.display = 'flex';
+        document.getElementById('localVideo').style.display = 'none';
       }
 
-      micBtn.disabled = false;
-      camBtn.disabled = isAudioOnly;
-      endBtn.disabled = false;
-      chatToggleBtn.disabled = false;
+      document.getElementById('micBtn').disabled = false;
+      document.getElementById('camBtn').disabled = isAudioOnly;
+      document.getElementById('endBtn').disabled = false;
+      document.getElementById('chatToggleBtn').disabled = false;
     }
 
-    // 10-Digit Random ID & Create Call
+    // 10-Digit Random ID Call Creation
     async function createCall() {
       await initMedia();
-      setupPanel.style.display = 'none';
-      statusText.innerText = "Waiting for partner...";
+      document.getElementById('setupPanel').style.display = 'none';
+      document.getElementById('statusText').innerText = "Waiting for partner...";
 
       const random10DigitId = Math.floor(1000000000 + Math.random() * 9000000000).toString();
       activeCallDoc = firestore.collection('calls').doc(random10DigitId);
@@ -366,7 +382,7 @@
       const offerCandidates = activeCallDoc.collection('offerCandidates');
       const answerCandidates = activeCallDoc.collection('answerCandidates');
 
-      roomIdText.innerText = "Room ID: " + activeCallDoc.id;
+      document.getElementById('roomIdText').innerText = "Room ID: " + activeCallDoc.id;
 
       pc.onicecandidate = event => {
         event.candidate && offerCandidates.add(event.candidate.toJSON());
@@ -381,7 +397,7 @@
         const data = snapshot.data();
         if (!pc.currentRemoteDescription && data?.answer) {
           pc.setRemoteDescription(new RTCSessionDescription(data.answer));
-          statusText.innerText = "Connected";
+          document.getElementById('statusText').innerText = "Connected";
         }
       });
 
@@ -396,14 +412,14 @@
       listenForMessages();
     }
 
-    // Join Call with 10-Digit ID
+    // Join Call
     async function joinCall() {
       const callId = document.getElementById('callInput').value.trim();
       if (!callId) return alert("Please enter 10-Digit Room ID");
 
       await initMedia();
-      setupPanel.style.display = 'none';
-      statusText.innerText = "Connecting...";
+      document.getElementById('setupPanel').style.display = 'none';
+      document.getElementById('statusText').innerText = "Connecting...";
 
       activeCallDoc = firestore.collection('calls').doc(callId);
       const answerCandidates = activeCallDoc.collection('answerCandidates');
@@ -430,41 +446,42 @@
         });
       });
 
-      statusText.innerText = "Connected";
-      roomIdText.innerText = "Room ID: " + callId;
+      document.getElementById('statusText').innerText = "Connected";
+      document.getElementById('roomIdText').innerText = "Room ID: " + callId;
       listenForMessages();
     }
 
-    // Chat Functions
+    // Chat Logic
     function toggleChat() {
-      chatBox.style.display = chatBox.style.display === 'flex' ? 'none' : 'flex';
+      const box = document.getElementById('chatBox');
+      box.style.display = box.style.display === 'flex' ? 'none' : 'flex';
     }
 
     async function sendMessage() {
-      const text = msgInput.value.trim();
+      const input = document.getElementById('msgInput');
+      const text = input.value.trim();
       if (!text || !activeCallDoc) return;
 
-      const chatCol = activeCallDoc.collection('chats');
-      await chatCol.add({
-        sender: pc.localDescription.type === 'offer' ? 'caller' : 'receiver',
+      await activeCallDoc.collection('chats').add({
+        sender: currentUser.email,
         text: text,
         timestamp: Date.now()
       });
 
-      msgInput.value = '';
+      input.value = '';
     }
 
     function listenForMessages() {
-      const myRole = pc.localDescription.type === 'offer' ? 'caller' : 'receiver';
       activeCallDoc.collection('chats').orderBy('timestamp').onSnapshot(snapshot => {
         snapshot.docChanges().forEach(change => {
           if (change.type === 'added') {
             const data = change.doc.data();
             const div = document.createElement('div');
-            div.className = `msg ${data.sender === myRole ? 'outgoing' : 'incoming'}`;
+            div.className = `msg ${data.sender === currentUser.email ? 'outgoing' : 'incoming'}`;
             div.innerText = data.text;
-            chatMessages.appendChild(div);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+            const container = document.getElementById('chatMessages');
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
           }
         });
       });
@@ -474,8 +491,9 @@
       const audioTrack = localStream.getAudioTracks()[0];
       if (audioTrack) {
         audioTrack.enabled = !audioTrack.enabled;
-        micBtn.classList.toggle('off', !audioTrack.enabled);
-        micBtn.innerHTML = audioTrack.enabled ? `<i class="fa-solid fa-microphone"></i>` : `<i class="fa-solid fa-microphone-slash"></i>`;
+        const btn = document.getElementById('micBtn');
+        btn.classList.toggle('off', !audioTrack.enabled);
+        btn.innerHTML = audioTrack.enabled ? `<i class="fa-solid fa-microphone"></i>` : `<i class="fa-solid fa-microphone-slash"></i>`;
       }
     }
 
@@ -484,8 +502,9 @@
       const videoTrack = localStream.getVideoTracks()[0];
       if (videoTrack) {
         videoTrack.enabled = !videoTrack.enabled;
-        camBtn.classList.toggle('off', !videoTrack.enabled);
-        camBtn.innerHTML = videoTrack.enabled ? `<i class="fa-solid fa-video"></i>` : `<i class="fa-solid fa-video-slash"></i>`;
+        const btn = document.getElementById('camBtn');
+        btn.classList.toggle('off', !videoTrack.enabled);
+        btn.innerHTML = videoTrack.enabled ? `<i class="fa-solid fa-video"></i>` : `<i class="fa-solid fa-video-slash"></i>`;
       }
     }
 
