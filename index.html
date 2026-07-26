@@ -258,8 +258,9 @@
         </button>
       </div>
 
-      <button class="btn-action btn-create" onclick="createCall()">Start New Call</button>
-      <input type="text" class="main-input" id="callInput" placeholder="Enter 10-Digit Room ID">
+      <!-- Input for both Creating Custom ID & Joining -->
+      <input type="text" class="main-input" id="callInput" placeholder="Enter Custom Number / Room ID">
+      <button class="btn-action btn-create" onclick="createCall()">Create Call with Number</button>
       <button class="btn-action btn-join" onclick="joinCall()">Join Call</button>
     </div>
 
@@ -306,7 +307,6 @@
     let activeCallDoc = null;
     let currentUser = null;
 
-    // Login Handle Logic
     auth.onAuthStateChanged(user => {
       if (user) {
         currentUser = user;
@@ -370,14 +370,16 @@
       document.getElementById('chatToggleBtn').disabled = false;
     }
 
-    // 10-Digit Random ID Call Creation
+    // Create Call with Custom Manual ID / Number
     async function createCall() {
+      const customId = document.getElementById('callInput').value.trim();
+      if (!customId) return alert("Pehle box me koi custom number ya ID likho!");
+
       await initMedia();
       document.getElementById('setupPanel').style.display = 'none';
       document.getElementById('statusText').innerText = "Waiting for partner...";
 
-      const random10DigitId = Math.floor(1000000000 + Math.random() * 9000000000).toString();
-      activeCallDoc = firestore.collection('calls').doc(random10DigitId);
+      activeCallDoc = firestore.collection('calls').doc(customId);
       
       const offerCandidates = activeCallDoc.collection('offerCandidates');
       const answerCandidates = activeCallDoc.collection('answerCandidates');
@@ -412,10 +414,10 @@
       listenForMessages();
     }
 
-    // Join Call
+    // Join Call using same Custom ID
     async function joinCall() {
       const callId = document.getElementById('callInput').value.trim();
-      if (!callId) return alert("Please enter 10-Digit Room ID");
+      if (!callId) return alert("Please enter Room ID / Number to join");
 
       await initMedia();
       document.getElementById('setupPanel').style.display = 'none';
@@ -430,7 +432,7 @@
       };
 
       const callData = (await activeCallDoc.get()).data();
-      if (!callData) return alert("Invalid Room ID");
+      if (!callData) return alert("Invalid Room ID or Call not found!");
 
       await pc.setRemoteDescription(new RTCSessionDescription(callData.offer));
       const answerDescription = await pc.createAnswer();
